@@ -1,43 +1,58 @@
-# Layoffs Data Cleaning Project using SQL 📊
-This project demonstrates a comprehensive data cleaning process on a real-world dataset of company layoffs. The goal was to transform a raw, messy dataset into a clean, structured format ready for exploratory data analysis (EDA).
+# 📊 Layoffs Data Cleaning Project  
 
-Key Skills Demonstrated 🛠️
-SQL Data Cleaning: Mastering essential data cleaning techniques.
+This project demonstrates a comprehensive **data cleaning process** using SQL on a real-world layoffs dataset. The goal was to transform raw, messy data into a **clean, structured format** ready for **exploratory data analysis (EDA).**  
 
-Data Manipulation Language (DML): Using UPDATE, DELETE, and INSERT to modify data.
+---
 
-Data Definition Language (DDL): Using CREATE TABLE, DROP TABLE, and ALTER TABLE to manage database structure.
+## 🛠️ Key Skills Demonstrated  
 
-SQL Functions: Applying string functions (TRIM), date functions (STR_TO_DATE), and window functions (ROW_NUMBER()).
+- **SQL Data Cleaning**: Mastering essential data wrangling techniques.  
+- **Data Manipulation Language (DML)**: `UPDATE`, `DELETE`, and `INSERT` for modifying records.  
+- **Data Definition Language (DDL)**: `CREATE TABLE`, `DROP TABLE`, and `ALTER TABLE` for managing database structure.  
+- **SQL Functions**:  
+  - String functions: `TRIM()`  
+  - Date functions: `STR_TO_DATE()`  
+  - Window functions: `ROW_NUMBER()`  
+- **Table Joins & CTEs**: Efficient querying with **Common Table Expressions (CTEs)** and joins.  
 
-Table Joins & CTEs: Utilizing joins for data population and Common Table Expressions (CTEs) for efficient querying.
+---
 
-Project Steps 📋
-1. Data Staging & Duplicate Removal
-A staging table (layoffs_staging) was created to work on a copy of the original data, ensuring the raw data remains untouched.
+## 📋 Project Steps  
 
-Duplicates were identified using a ROW_NUMBER() window function partitioned by all columns. A row_num greater than one indicates a duplicate.
+### 1. Data Staging & Duplicate Removal  
+- Created a **staging table** (`layoffs_staging`) to preserve raw data.  
+- Identified duplicates using:  ROW_NUMBER() OVER (
+PARTITION BY all_columns ORDER BY (SELECT NULL)
+) AS row_num
+- Removed rows where `row_num > 1`.  
 
-These duplicate rows were then removed from the dataset.
+---
 
-2. Data Standardization
-Company Names: The TRIM() function was used to remove leading and trailing whitespace from the company column.
+### 2. Data Standardization  
+- **Company Names**: Trimmed extra spaces (`TRIM()`).  
+- **Industry Names**: Used `LIKE` to merge inconsistent values → e.g., *‘Crypto Currency’* → *‘Crypto’*.  
+- **Country Names**: Fixed inconsistencies → e.g., *‘United States.’* → *‘United States’*.  
+- **Date Format**: Converted text to `DATE` type using:  STR_TO_DATE(date_column, '%m/%d/%Y')
+and updated schema with:  ALTER TABLE layoffs_staging MODIFY COLUMN date DATE;
 
-Industry Names: The LIKE operator was used to find and standardize inconsistent industry names (e.g., 'Crypto Currency', 'Cryptocurrency' to 'Crypto').
+---
 
-Country Names: Inconsistent country names were standardized (e.g., 'United States.' to 'United States').
+### 3. Handling Null & Blank Values  
+- Utilized a **self-join** to populate missing `industry` values from existing company records.  
+- Ensured more complete representation of data.  
 
-Date Format: The date column, originally a text string, was converted to a proper DATE data type using STR_TO_DATE() and ALTER TABLE.
+---
 
-3. Handling Null & Blank Values
-A self-join was used to populate missing industry values. The script joined the table on company to find instances where a company's industry was known and filled in the blanks where it was not.
+### 4. Final Cleanup  
+- Removed rows where both `total_laid_off` and `percentage_laid_off` were **NULL**.  
+- Dropped temporary helper column (`row_num`) used during de-duplication.  
+- Produced a **fully cleaned table** ready for exploratory analysis.  
 
-4. Final Cleanup
-Rows with no useful information (where both total_laid_off and percentage_laid_off were NULL) were removed.
+---
 
-The temporary row_num column, which was only needed for the de-duplication process, was dropped to finalize the clean table.
+## 📂 Project Files  
 
-Project Files 📂
-Data Cleaning.sql: Contains all the SQL queries used for the data cleaning process.
+- **`Data Cleaning.sql`** → All SQL queries used in the cleaning process.  
+- **`layoffs.csv`** → Original raw dataset.  
 
-layoffs.csv: The original raw dataset used for this project.
+---
